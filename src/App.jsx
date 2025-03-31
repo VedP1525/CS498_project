@@ -1,14 +1,8 @@
-import { useState } from 'react'
-import './App.css'
+import Matching from './components/Matching'
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+export default function App() {
   return (
-    <>
-
-    </>
+    <Matching />
   )
-}
-
-export default App
+};

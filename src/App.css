@@ -1,0 +1,71 @@
+* {
+    background-color: green;
+}
+
+.buttonLevels {
+    font-size: 1em;
+    color: black;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#easy {
+    padding: 1% 1%;
+    border-radius: 10px;
+    background-color: bisque;
+}
+
+#medium {
+    padding: 1% 1%;
+    border-radius: 10px;
+    background-color: lightblue;
+}
+
+#hard {
+    padding: 1% 1%;
+    border-radius: 10px;
+    background-color: red;
+}
+
+#card-container-easy {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    justify-content: space-between;
+    margin-left: 10%;
+}
+
+#card-container-medium {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    justify-content: space-between;
+    margin-left: 10%;
+}
+
+#card-container-hard {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr); 
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.card {
+    width: 120px;
+    height: 200px;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.card-img {
+    width: 100%;
+    height: 100%;
+}
+
+button {
+    margin: 10px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+h3 {
+    margin-bottom: 10px;
+}
