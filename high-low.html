@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Higher or Lower Game</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        img { height: 150px; }
+    </style>
+</head>
+<body>
+    <h1>Higher or Lower Game</h1>
+    <button onclick="startGame()">Start Game</button>
+    <div id="game" style="display:none;">
+        <p>Current Card:</p>
+        <img id="currentCard" src="" alt="Card">
+        <p>Score: <span id="score">0</span></p>
+        <button onclick="makeGuess('higher')">Higher</button>
+        <button onclick="makeGuess('lower')">Lower</button>
+    </div>
+    
+    <script>
+        let deckId, currentValue, score = 0;
+
+        async function startGame() {
+            let deck = await fetch("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1").then(res => res.json());
+            deckId = deck.deck_id;
+            drawCard();
+            document.getElementById("game").style.display = "block";
+        }
+
+        async function drawCard() {
+            let data = await fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=1`).then(res => res.json());
+            let card = data.cards[0];
+            document.getElementById("currentCard").src = card.image;
+            currentValue = getValue(card.value);
+        }
+
+        function getValue(value) {
+            if (value === "ACE") return 14;
+            if (value === "JACK") return 11;
+            if (value === "QUEEN") return 12;
+            if (value === "KING") return 13;
+            return parseInt(value);
+        }
+
+        async function makeGuess(guess) {
+            let oldValue = currentValue;
+            await drawCard();
+            let newValue = currentValue;
+            
+            if ((guess === "higher" && newValue > oldValue) || (guess === "lower" && newValue < oldValue)) {
+                score++;
+                alert("Correct!");
+            } else {
+                alert("Wrong! Game Over. Final Score: " + score);
+                score = 0;
+            }
+            document.getElementById("score").innerText = score;
+        }
+    </script>
+</body>
+</html>
