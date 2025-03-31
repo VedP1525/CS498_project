@@ -22,7 +22,7 @@ function Matching() {
     useEffect(() => {
         if (!deckId) return;
         const fetchCards = async () => {
-            const numCards = mode === 3 ? 3 : mode === 5 ? 5 : 10; 
+            const numCards = mode === 5 ? 5 : mode === 7 ? 7 : 10; 
             const response = await fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=${numCards}`);
             const data = await response.json();
             const drawnCards = data.cards.map(card => ({
@@ -76,11 +76,11 @@ function Matching() {
     };
 
     const setEasy = () => {
-        setMode(3);
+        setMode(5);
     };
 
     const setMedium = () => {
-        setMode(5);
+        setMode(7);
     };
 
     const setHard = () => {
@@ -92,8 +92,8 @@ function Matching() {
             <button onClick={setEasy} id="easy">Easy Mode</button>
             <button onClick={setMedium} id="medium">Medium Mode</button>
             <button onClick={setHard} id="hard">Hard Mode</button>
-            {mode === 3 && <Easy mode={mode} cards={cards} handleCardClick={handleCardClick} flippedIndices={flippedIndices} matchedCards={matchedCards} />}
-            {mode === 5 && <Medium mode={mode} cards={cards} handleCardClick={handleCardClick} flippedIndices={flippedIndices} matchedCards={matchedCards} />}
+            {mode === 5 && <Easy mode={mode} cards={cards} handleCardClick={handleCardClick} flippedIndices={flippedIndices} matchedCards={matchedCards} />}
+            {mode === 7 && <Medium mode={mode} cards={cards} handleCardClick={handleCardClick} flippedIndices={flippedIndices} matchedCards={matchedCards} />}
             {mode === 10 && <Hard mode={mode} cards={cards} handleCardClick={handleCardClick} flippedIndices={flippedIndices} matchedCards={matchedCards} />}
         </div>
     );
