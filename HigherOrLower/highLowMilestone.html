@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Higher or Lower Game</title>
+    <style>
+
+        body {
+            /* Sets a background image */
+            background: url('CardTableBG.png') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            color: #fff;
+        }
+
+        /* Sets all future elements color to white */
+        h1, h2, h3, h4, h5, h6,
+        p, label, summary,
+        button, select, option, input {
+            color: #fff;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        /* A flex container that holds hints and tips */
+        #instructionContainer {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1000px;
+            margin: 20px auto;
+        }
+
+        /* Start and select lives have black background with white border and letters */
+        select, button {
+            background-color: #000;
+            color: #fff;
+            border: 1px solid #fff;
+            padding: 5px 10px;
+            margin: 5px;
+        }
+
+        /* Styles the dropdown boxes */
+        details {
+            width: 45%;
+            border: 1px solid #ddd;
+            padding: 10px;
+            box-sizing: border-box;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Boldens instructions and tips */
+        summary {
+            font-weight: bold;
+            margin-bottom: 5px;
+            outline: none;
+        }
+
+        /* Styles each card stack container */
+        .card-stack {
+            display: inline-block;
+            margin: 10px;
+            vertical-align: top;
+        }
+
+            .card-stack img {
+                height: 150px;
+                display: block;
+                margin: 0 auto;
+            }
+        /* If a stack is "eliminated", it is grayed out */
+        .eliminated {
+            filter: grayscale(100%);
+            opacity: 0.5;
+        }
+
+        button {
+            margin: 5px;
+        }
+
+        /* Centers the text inside these containers */
+        #deckInfo, #game, #gameResult {
+            text-align: center;
+        }
+
+        /* Styles the actual game area */
+        #game {
+            background: url('CardTableBG.png') no-repeat center center fixed;
+            background-size: cover;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Higher or Lower</h1>
+
+    <div id="instructionContainer">
+        <!-- Game Rules Dropdown -->
+        <details id="gameRules">
+            <summary>Game Rules</summary>
+            <p>1. Select the number of lives you want to play with. Each life is represented as a separate card stack.</p>
+            <p>2. When the game starts, a card is dealt face-up for each stack from a deck.</p>
+            <p>3. Click on the "Higher" or "Lower" button for any active stack to guess if the next card drawn will be higher or lower than the current card.</p>
+            <p>4. If your guess is correct, the new card replaces the old one and the stack remains active.</p>
+            <p>5. If your guess is wrong, that stack is eliminated and displays the card that ended it.</p>
+            <p>6. The game ends when either all stacks are eliminated (you lose) or when the deck runs out of cards (you win).</p>
+            <p>7. The cards are valued lowest to highest, with 2 being the lowest and Ace being the highest.</p>
+        </details>
+        <!-- Hints & Tips Dropdown -->
+        <details id="gameTips">
+            <summary>Hints &amp; Tips</summary>
+            <p>- Pay attention to which cards you have already been dealt. You can only be dealt one of each card so use that to your advantage.</p>
+            <p>- Being dealt the same card as what is on top of the stack results in a wrong guess. Use the cards that you have already been dealt to help choose which stacks to guess on.</p>
+            <p>- Keep an eye on the remaining cards in the deck to adjust your strategy.</p>
+        </details>
+    </div>
+
+    <!-- Lives and start Button -->
+    <div style="text-align: center;">
+        <label for="lives">Select number of lives:</label>
+        <select id="lives">
+            <!-- 6, 8, 10 lives -->
+            <option value="6">6 Lives</option>
+            <option value="8">8 Lives</option>
+            <option value="10">10 Lives</option>
+        </select>
+        <button onclick="startGame()">Start Game</button>
+    </div>
+
+    <!-- Deck Info -->
+    <div id="deckInfo" style="display:none;">
+        <p>Cards remaining in deck: <span id="deckRemaining"></span></p>
+    </div>
+
+    <!-- Game Container -->
+    <div id="game" style="display:none;">
+        <div id="stacksContainer">
+        </div>
+    </div>
+
+    <!-- Game Result -->
+    <div id="gameResult" style="display:none;">
+        <h2 id="resultMessage"></h2>
+    </div>
+
+    <script>
+
+        // - deckId: stores the unique deck identifier from the API
+        // - deckCards: holds all cards fetched from the API
+        // - stacks: array holding the card stacks
+        // - score: holds the current game score
+        let deckId;
+        let deckCards = [];
+        let stacks = [];
+        let score = 0;
+
+        const apiUrl = "https://deckofcardsapi.com/api/deck";
+
+        function getValue(value) {
+            if (value === "ACE") return 14;
+            if (value === "JACK") return 11;
+            if (value === "QUEEN") return 12;
+            if (value === "KING") return 13;
+            return parseInt(value);
+        }
+
+        function updateDeckRemaining() {
+            document.getElementById("deckRemaining").innerText = deckCards.length;
+        }
+
+        // Clears the stacksContainer and renders each card stack
+        // For each stack:
+        //   - Creates a div with class "card-stack"
+        //   - If the stack is inactive, adds the "eliminated" class
+        //   - If active, adds "Higher" and "Lower" buttons that call makeGuess()
+        //   - If not active, shows "Eliminated" text
+        function renderStacks() {
+            const container = document.getElementById("stacksContainer");
+            container.innerHTML = "";
+            stacks.forEach((stack, index) => {
+                const stackDiv = document.createElement("div");
+                stackDiv.className = "card-stack";
+                if (!stack.active) {
+                    stackDiv.classList.add("eliminated");
+                }
+
+                // Create the image element for the card
+                const img = document.createElement("img");
+                img.src = stack.card.image;
+                img.alt = "Card";
+                stackDiv.appendChild(img);
+
+                // If the card stack is active, create and attach the guess buttons
+                if (stack.active) {
+                    const higherBtn = document.createElement("button");
+                    higherBtn.innerText = "Higher";
+                    higherBtn.onclick = () => makeGuess(index, "higher");
+                    stackDiv.appendChild(higherBtn);
+
+                    const lowerBtn = document.createElement("button");
+                    lowerBtn.innerText = "Lower";
+                    lowerBtn.onclick = () => makeGuess(index, "lower");
+                    stackDiv.appendChild(lowerBtn);
+                } else {
+                    // If the stack is eliminated, display an "Eliminated" message
+                    const eliminatedMsg = document.createElement("p");
+                    eliminatedMsg.innerText = "Eliminated";
+                    stackDiv.appendChild(eliminatedMsg);
+                }
+
+                container.appendChild(stackDiv);
+            });
+        }
+
+        // Starts a new game:
+        //  - Hides previous game result
+        //  - Retrieves number of selected lives
+        //  - Clears the stack array
+        //  - Hides the game container until it is needed
+        //  - Fetches new deck from the API
+        //  - Updates remaining deck count
+        //  - Selects cards for each life stack
+        //  - Renders stacks and displays game container
+        async function startGame() {
+            // Hide previous game results
+            document.getElementById("gameResult").style.display = "none";
+
+            // Retrieve the number of lives
+            const lives = parseInt(document.getElementById("lives").value);
+            stacks = [];
+
+            // Hide the game container
+            document.getElementById("game").style.display = "none";
+
+            // Fetch a new shuffled deck
+            const deckData = await fetch(apiUrl + "/new/shuffle/?deck_count=1").then(res => res.json());
+            deckId = deckData.deck_id;
+
+            // Draw 52 cards from the deck
+            const allCardsData = await fetch(`${apiUrl}/${deckId}/draw/?count=52`).then(res => res.json());
+            deckCards = allCardsData.cards;
+            updateDeckRemaining();
+
+            // Randomly choose one card and add it to the stacks
+            for (let i = 0; i < lives; i++) {
+                const randIndex = Math.floor(Math.random() * deckCards.length);
+                const card = deckCards.splice(randIndex, 1)[0];
+                stacks.push({
+                    card: card,
+                    active: true
+                });
+            }
+            updateDeckRemaining();
+            renderStacks();
+
+            // Display the game container and deck info
+            document.getElementById("game").style.display = "block";
+            document.getElementById("deckInfo").style.display = "block";
+        }
+
+        // Processes the player's guess for the chosen stack:
+        //  - Checks if the stack is active
+        //  - Retrieves the current card value
+        //  - If no cards are left, calls gameWon()
+        //  - Otherwise, selects a new card from the remaining deck
+        //  - Updates the deck count
+        //  - Compares the new card's value with the old card's value
+        //  - Updates the chosen stack with the new card
+        //  - Re-renders the stacks and checks if the game should end
+        function makeGuess(stackIndex, guess) {
+
+            if (!stacks[stackIndex].active) return;
+
+            // Get the current card and its value
+            const oldCard = stacks[stackIndex].card;
+            const oldValue = getValue(oldCard.value);
+
+            // If there are no cards left in the deck the game is won
+            if (deckCards.length === 0) {
+                gameWon();
+                return;
+            }
+
+            // Select a new card from the deck
+            const randIndex = Math.floor(Math.random() * deckCards.length);
+            const newCard = deckCards.splice(randIndex, 1)[0];
+            updateDeckRemaining();
+
+            // Get the new card's value
+            const newValue = getValue(newCard.value);
+            let correct = false;
+            // Determine if the guess is correct
+            if ((guess === "higher" && newValue > oldValue) ||
+                (guess === "lower" && newValue < oldValue)) {
+                correct = true;
+                score++;
+            } else {
+                score = 0;
+            }
+            // Replace the old card with the new card in the stack
+            stacks[stackIndex].card = newCard;
+            // If the guess was wrong, mark the stack as inactive
+            if (!correct) {
+                stacks[stackIndex].active = false;
+            }
+
+            // Re-render the stacks to show the new card and any changes
+            renderStacks();
+
+            // End the game if all stacks have been eliminated
+            if (stacks.every(stack => !stack.active)) {
+                gameOver();
+                return;
+            }
+
+            // If no cards remain declare the game as won
+            if (deckCards.length === 0) {
+                gameWon();
+            }
+        }
+
+        // Displays a game over message
+        function gameOver() {
+            document.getElementById("gameResult").style.display = "block";
+            document.getElementById("resultMessage").innerText = "Game Over! You lost all your lives.";
+        }
+
+        // Displays a win message
+        function gameWon() {
+            document.getElementById("gameResult").style.display = "block";
+            document.getElementById("resultMessage").innerText = "Congratulations! You've finished the deck.";
+        }
+    </script>
+</body>
+</html>
+
