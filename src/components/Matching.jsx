@@ -6,8 +6,7 @@ function Matching() {
     const [deckId, setDeckId] = useState(null);
     const [flippedIndices, setFlippedIndices] = useState([]); 
     const [matchedCards, setMatchedCards] = useState([]); 
-    const [isFlipping, setIsFlipping] = useState(false);
-    const [lives, setLives] = useState([]);
+    const [isFlipping, setIsFlipping] = useState(false); 
 
     // Fetch new deck from the API
     useEffect(() => {
@@ -35,35 +34,10 @@ function Matching() {
             const duplicateCards = [...drawnCards, ...drawnCards];
             shuffleArray(duplicateCards);
             setCards(duplicateCards);
-            setLives(mode === 5 ? 10 : mode === 7 ? 5 : 3); // Set lives based on mode, 10 for easy, 5 for medium, 3 for hard.
         };
         fetchCards();
     }, [deckId, mode]);
-    
-    // Check for win condition
-    useEffect(() => {
-        if (matchedCards.length === cards.length / 2) {
-            alert("Congratulations! You've matched all the cards!");
-            setFlippedIndices([]);
-            setMatchedCards([]);
-            setCards([]);
-            setMode(null);
-            setDeckId(null);
-        }
-    }, [matchedCards, cards]);
 
-    // Check lives for game over condition (lives reduced to 0)
-    useEffect(() => {
-        if (lives === 0) {
-            alert("Game Over! You ran out of lives!");
-            setFlippedIndices([]);
-            setMatchedCards([]);
-            setCards([]);
-            setMode(null); // Reset mode
-            setDeckId(null); // Reset deck ID
-        }
-    }, [lives]);
-    
     // Shuffle the cards randomly
     const shuffleArray = (array) => {
         for (let i = array.length - 1; i > 0; i--) {
