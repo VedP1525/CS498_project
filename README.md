@@ -26,5 +26,5 @@ In total we will have three games which are as follows:
 
 # Higher Or Lower
 ![Image 3-31-25 at 8 55 PM](https://github.com/user-attachments/assets/fdc36c8e-3ac6-4161-9d97-03300a37ceb6)
-
+To launch Higher or Lower, run the highLowMilestone file in the HigherOrLower file, making sure to download the png in the same folder.
 
