@@ -102,7 +102,7 @@ function Matching() {
 function Easy({ mode, cards, handleCardClick, flippedIndices, matchedCards }) {
     return (
         <>
-            <h3>Easy Mode ({mode} Cards)</h3>
+            <h3 style={{textAlign:"center", color:"white", fontSize:"2em"}}>Easy Mode ({mode} Cards)</h3>
             <div id="card-container-easy">
                 {cards.map((card, index) => (
                     <Card
@@ -122,7 +122,7 @@ function Easy({ mode, cards, handleCardClick, flippedIndices, matchedCards }) {
 function Medium({ mode, cards, handleCardClick, flippedIndices, matchedCards }) {
     return (
         <>
-            <h3>Medium Mode ({mode} Cards)</h3>
+            <h3 style={{textAlign:"center", color:"white", fontSize:"2em"}}>Medium Mode ({mode} Cards)</h3>
             <div id="card-container-medium">
                 {cards.map((card, index) => (
                     <Card
@@ -142,7 +142,7 @@ function Medium({ mode, cards, handleCardClick, flippedIndices, matchedCards }) 
 function Hard({ mode, cards, handleCardClick, flippedIndices, matchedCards }) {
     return (
         <>
-            <h3>Hard Mode ({mode} Cards)</h3>
+            <h3 style={{textAlign:"center", color:"white", fontSize:"2em"}}>Hard Mode ({mode} Cards)</h3>
             <div id="card-container-hard">
                 {cards.map((card, index) => (
                     <Card

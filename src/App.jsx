@@ -14,12 +14,19 @@ export default function App() {
     setBlackjack(true);
     setMatching(false);
   }
+  const goToHighLow = () => {
+    setBlackjack(false);
+    setMatching(false);
+    window.location.href = "./HigherOrLower/highLowMilestone.html";
+  }
   return (
     <>
-      <button onClick={goToMatching} style={{padding: '1% 1%'}}>Matching Game</button>
+      {!matching && <button onClick={goToMatching} style={{padding: '1% 1%'}}>Matching Game</button>}
       {matching && <Matching />}
-      <button onClick={goToBlackjack} style={{padding: '1% 1%'}}>Blackjack Game</button>
+      {!blackjack && <button onClick={goToBlackjack} style={{padding: '1% 1%'}}>Blackjack Game</button>}
       {blackjack && <Blackjack />}
+      <button onClick={goToHighLow} style={{padding: '1% 1%'}}>HigherOrLower Game</button>
+
     </>
   )
 };
