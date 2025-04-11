@@ -7,6 +7,10 @@ function Blackjack() {
   const [gameOver, setGameOver] = useState(true);
   const [playerStand, setPlayerStand] = useState(false);
   const [message, setMessage] = useState('');
+  const [playerWins, setPlayerWins] = useState(0);
+  const [dealerWins, setDealerWins] = useState(0);
+  const [playerScore, setPlayerScore] = useState(0);
+  const [dealerScore, setDealerScore] = useState(0);
 
   // Calculate hand value with Ace handling.
   const calculateHand = (cards) => {
@@ -26,8 +30,9 @@ function Blackjack() {
       total -= 10;
       aces--;
     }
-    // Determine if hand is soft.
-    const soft = cards.some(card => card.value === "ACE") && total <= 21 && (total - cards.filter(c => c.value === "ACE").length * 1) < total;
+    const soft = cards.some(card => card.value === "ACE") &&
+                 total <= 21 &&
+                 (total - cards.filter(c => c.value === "ACE").length * 1) < total;
     return { total, soft };
   };
 
@@ -56,9 +61,7 @@ function Blackjack() {
       // Reshuffle the existing deck.
       await fetch(`https://deckofcardsapi.com/api/deck/${currentDeckId}/shuffle/`);
     }
-    // Use currentDeckId (whether newly fetched or existing) to draw cards.
     const dealerDraw = await drawCards(currentDeckId, 2);
-    // Mark the second dealer card as facedown.
     const dealerWithFace = dealerDraw.map((card, index) => ({
       ...card,
       facedown: index === 1
@@ -86,11 +89,9 @@ function Blackjack() {
   // Player "Stand": Reveal dealer card and let dealer draw.
   const handleStand = async () => {
     setPlayerStand(true);
-    // Reveal dealer's facedown card.
     const revealedDealer = dealerCards.map(card => ({ ...card, facedown: false }));
     setDealerCards(revealedDealer);
 
-    // Dealer draws following soft 17 rules.
     let currentDealerCards = [...revealedDealer];
     let { total, soft } = calculateHand(currentDealerCards);
     while (total < 17 || (total === 17 && soft)) {
@@ -103,23 +104,44 @@ function Blackjack() {
     setGameOver(true);
   };
 
-  // Determine the winner.
+  // Determine the winner and update scoreboard stats.
   const determineWinner = (dealerHand, playerHand) => {
     const playerValue = calculateHand(playerHand).total;
     const dealerValue = calculateHand(dealerHand).total;
+    const totalCards = dealerHand.length + playerHand.length;
     let outcome = '';
     if (dealerValue > 21) {
       outcome = 'Dealer Busts! Player wins.';
+      setPlayerWins(prev => prev + 1);
+      setPlayerScore(prev => prev + totalCards);
     } else if (playerValue > 21) {
       outcome = 'Player Busts! Dealer wins.';
+      setDealerWins(prev => prev + 1);
+      setDealerScore(prev => prev + totalCards);
     } else if (playerValue > dealerValue) {
       outcome = 'Player wins!';
+      setPlayerWins(prev => prev + 1);
+      setPlayerScore(prev => prev + totalCards);
     } else if (dealerValue > playerValue) {
       outcome = 'Dealer wins!';
+      setDealerWins(prev => prev + 1);
+      setDealerScore(prev => prev + totalCards);
     } else {
       outcome = 'Push (tie)!';
     }
     setMessage(outcome);
+  };
+
+  // Reset Hands Won stats.
+  const resetHands = () => {
+    setPlayerWins(0);
+    setDealerWins(0);
+  };
+
+  // Reset Score stats.
+  const resetScore = () => {
+    setPlayerScore(0);
+    setDealerScore(0);
   };
 
   // Render a card image or card back if facedown.
@@ -144,7 +166,6 @@ function Blackjack() {
     );
   };
 
-  // Display dealer's hand value only after player stands.
   const dealerHandValue = playerStand ? calculateHand(dealerCards).total : '?';
   const playerHandValue = calculateHand(playerCards).total;
 
@@ -185,6 +206,23 @@ function Blackjack() {
         </div>
 
         {message && <div className="message">{message}</div>}
+
+        <div className="scoreboard">
+          <div className="scoreboard-column">
+            <h3>Player Stats</h3>
+            <p>Hands Won: {playerWins}</p>
+            <p>Score: {playerScore}</p>
+          </div>
+          <div className="scoreboard-column">
+            <h3>Dealer Stats</h3>
+            <p>Hands Won: {dealerWins}</p>
+            <p>Score: {dealerScore}</p>
+          </div>
+          <div className="scoreboard-column">
+            <button className="reset-hands" onClick={resetHands}>Reset Hands</button>
+            <button className="reset-score" onClick={resetScore}>Reset Score</button>
+          </div>
+        </div>
       </div>
     </div>
   );
