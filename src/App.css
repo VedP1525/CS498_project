@@ -84,3 +84,51 @@ h3 {
     min-height: calc(100vh - 120px); 
   }
   
+.scoreboard {
+    background-color: white;
+    color: black;
+    padding: 20px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+    width: 90%;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+.scoreboard-column {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+.scoreboard,
+.scoreboard * {
+    background-color: white !important;
+}
+  
+  .reset-hands, .reset-score {
+    margin: 10px;
+    padding: 10px 15px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #ccc;
+    color: black;
+  }
+  
+.reset-hands:hover, .reset-score:hover {
+    background-color: #bbb;
+  
+}
+
+.scoreboard .reset-hands,
+.scoreboard .reset-score {
+  background-color: #ccc !important;
+  color: black !important;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
