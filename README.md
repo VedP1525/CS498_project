@@ -28,3 +28,7 @@ In total we will have three games which are as follows:
 ![Image 3-31-25 at 8 55 PM](https://github.com/user-attachments/assets/fdc36c8e-3ac6-4161-9d97-03300a37ceb6)
 To launch Higher or Lower, run the highLowMilestone file in the HigherOrLower file, making sure to download the png in the same folder.
 
+# New BlackJack Scoreboard
+
+<img width="1429" alt="Screenshot 2025-04-10 at 8 38 10 PM" src="https://github.com/user-attachments/assets/15b84fa9-d7aa-4059-aa79-bc75d8390655" />
+
